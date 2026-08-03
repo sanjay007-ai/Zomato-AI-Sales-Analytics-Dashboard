@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zomato AI Premium Dashboard</title>
+    <link rel="stylesheet" href="style.css?v=20260802" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand-block">
+                <div class="brand-logo" aria-label="Zomato logo">
+                    <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+                        <rect x="6" y="6" width="52" height="52" rx="14" fill="#ffffff" />
+                        <path d="M19 18h26l-6 9h-8l-4 6h8l-5 8h-7l5-8h-8l-5 8H14l6-9h8l4-6h-8l5-8z" fill="#E23744" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand">Zomato AI</div>
+                    <div class="subtitle">Premium food delivery insights</div>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <div id="liveClock" class="live-clock">--</div>
+                <div class="topbar-controls">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon" aria-hidden="true">🔍</span>
+                        <input id="searchBox" class="search-box" type="text" placeholder="Search orders or city" />
+                    </div>
+                    <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+                    <button id="exportCsvBtn" class="icon-btn">📥 CSV</button>
+                    <button id="exportPdfBtn" class="icon-btn">📄 PDF</button>
+                    <button id="resetBtn" class="btn-solid">Reset</button>
+                </div>
+            </div>
+        </header>
+
+        <section class="control-bar">
+            <div class="filter-group">
+                <label class="filter-label"><span class="filter-icon">🏙️</span>City</label>
+                <select id="cityFilter">
+                    <option value="">All Cities</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label"><span class="filter-icon">🍽️</span>Category</label>
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label"><span class="filter-icon">✅</span>Status</label>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label"><span class="filter-icon">💳</span>Payment Method</label>
+                <select id="paymentFilter">
+                    <option value="">All Payments</option>
+                </select>
+            </div>
+            <div class="filter-group slider-group">
+                <label class="filter-label"><span class="filter-icon">💸</span>Max Order Amount <span id="amountValue">₹0</span></label>
+                <input type="range" id="amountSlider" min="0" max="1000" value="1000" step="10" />
+            </div>
+            <div class="filter-group slider-group">
+                <label class="filter-label"><span class="filter-icon">🔢</span>Max Quantity <span id="quantityValue">0</span></label>
+                <input type="range" id="quantitySlider" min="1" max="10" value="10" step="1" />
+            </div>
+            <div class="filter-group date-range-group">
+                <label class="filter-label"><span class="filter-icon">📅</span>Order Date Range</label>
+                <div class="date-inputs">
+                    <div class="input-with-icon">
+                        <span class="input-icon" aria-hidden="true">📅</span>
+                        <input type="date" id="dateStart" />
+                    </div>
+                    <div class="input-with-icon">
+                        <span class="input-icon" aria-hidden="true">📅</span>
+                        <input type="date" id="dateEnd" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="summary-row">
+            <article class="summary-card summary-card-orders">
+                <div class="summary-top">
+                    <span class="summary-icon">📦</span>
+                    <span class="summary-label">Total Orders</span>
+                </div>
+                <strong id="totalOrders">0</strong>
+                <span id="trendOrders" class="trend-pill">▲ +5%</span>
+            </article>
+            <article class="summary-card summary-card-revenue">
+                <div class="summary-top">
+                    <span class="summary-icon">💰</span>
+                    <span class="summary-label">Revenue</span>
+                </div>
+                <strong id="totalSales">₹0</strong>
+                <span id="trendSales" class="trend-pill">▲ +8%</span>
+            </article>
+            <article class="summary-card summary-card-rating">
+                <div class="summary-top">
+                    <span class="summary-icon">⭐</span>
+                    <span class="summary-label">Rating</span>
+                </div>
+                <strong id="avgOrderValue">₹0</strong>
+                <span id="trendAvg" class="trend-pill">▼ -2%</span>
+            </article>
+            <article class="summary-card summary-card-customers">
+                <div class="summary-top">
+                    <span class="summary-icon">👥</span>
+                    <span class="summary-label">Customers</span>
+                </div>
+                <strong id="totalCustomers">0</strong>
+                <span id="trendCustomers" class="trend-pill">▲ +6%</span>
+            </article>
+            <article class="summary-card summary-card-completed">
+                <div class="summary-top">
+                    <span class="summary-icon">✅</span>
+                    <span class="summary-label">Completed</span>
+                </div>
+                <strong id="completedOrders">0%</strong>
+                <span id="trendCompleted" class="trend-pill">▲ +3%</span>
+            </article>
+            <article class="summary-card summary-card-restaurants">
+                <div class="summary-top">
+                    <span class="summary-icon">🏪</span>
+                    <span class="summary-label">Restaurants</span>
+                </div>
+                <strong id="totalRestaurants">0</strong>
+                <span id="trendRestaurants" class="trend-pill">▼ -1%</span>
+            </article>
+        </section>
+
+        <main class="dashboard-grid">
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Revenue by City</h3>
+                </div>
+                <canvas id="cityChart"></canvas>
+            </section>
+
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Monthly Sales Trend</h3>
+                </div>
+                <canvas id="monthlyChart"></canvas>
+            </section>
+
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Food Category Distribution</h3>
+                </div>
+                <canvas id="foodChart"></canvas>
+            </section>
+
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Order Status Breakdown</h3>
+                </div>
+                <canvas id="statusChart"></canvas>
+            </section>
+
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Top 10 Restaurants</h3>
+                </div>
+                <canvas id="restaurantChart"></canvas>
+            </section>
+
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Top Cities by Orders</h3>
+                </div>
+                <canvas id="ordersChart"></canvas>
+            </section>
+
+            <section class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Payment Method Distribution</h3>
+                </div>
+                <canvas id="paymentChart"></canvas>
+            </section>
+
+            <section class="chart-card chart-card-wide">
+                <div class="chart-card-header">
+                    <h3>India Sales Map</h3>
+                </div>
+                <div id="indiaMap" class="india-map"></div>
+            </section>
+
+            <section class="chart-card chart-card-wide table-card">
+                <div class="chart-card-header">
+                    <h3>Recent Orders</h3>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>City</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
