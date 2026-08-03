@@ -189,7 +189,7 @@ Aspiring Data Analyst
 
 ### GitHub
 
-https://github.com/YOUR_GITHUB_USERNAME
+https://github.com/sanjay007-ai
 
 ---
 
