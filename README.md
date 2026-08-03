@@ -144,16 +144,16 @@ Interactive Dashboard
 ## 📸 Dashboard Preview
 
 ### Main Dashboard
-![Dashboard](screenshots/dashboard-home.png)
+(Add Screenshot)
 
 ### Interactive Charts
-![Charts](screenshots/charts.png)
+(Add Screenshot)
 
 ### Recent Orders
-![Filters](screenshots/filters.png)
+(Add Screenshot)
 
 ### Filters
-![Orders](screenshots/orders-table.png)
+(Add Screenshot)
 ---
 
 # 🎯 Learning Outcomes
